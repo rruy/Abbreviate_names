@@ -1,0 +1,84 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <script src="http://code.jquery.com/jquery-3.1.1.min.js"   integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="   crossorigin="anonymous"></script>
+  <script>
+
+  function customTrim(x) {
+    return x.replace(/^\s+|\s+$/gm,'');
+  }
+
+  function exceptWords(partial_name) {
+    var except_words = ["dos", "das", "da", "do"]
+    for (var i = 0; i < except_words.length; i++) {
+        if (except_words[i] === partial_name) {
+            return true;
+        }
+    }
+    return false;
+  }
+
+  function removeSpecialChars(word) {
+    return word.replace(/[&\/\\#,+()$~%.'":*!?<>{}@:?]/g,'');
+  }
+
+  function removeAccent(word)
+  {
+    word = customTrim(word);
+    var with_accent = 'áàãâäéèêëíìîïóòõôöúùûüçÁÀÃÂÄÉÈÊËÍÌÎÏÓÒÕÖÔÚÙÛÜÇ';
+    var without_accent = 'aaaaaeeeeiiiiooooouuuucAAAAAEEEEIIIIOOOOOUUUUC';
+    var new_word = '';
+    for (i = 0 ; i <= word.length - 1; i++) {
+      var index = with_accent.search(word.substr(i,1))
+      if (index >= 0) {
+        new_word += without_accent.substr(index,1);
+      }
+      else {
+        new_word += word.substr(i,1);
+      }
+    }
+	  return new_word;
+  }
+
+  function reduceName(full_name, limit_size)  {
+      var name_treat = full_name;
+      name_treat = customTrim(name_treat);
+      name_treat = removeSpecialChars(name_treat);
+
+      var words =  name_treat.split(' ');
+      var first_pos = 0;
+      var last_pos = words.length;
+      var reduce_name = '';
+      console.log('words: ' + words)
+
+      for (var i = 0; i < last_pos; i++) {
+        if (exceptWords(words[i])){
+          continue;
+        }
+        if (i == first_pos || i == (last_pos - 1)) {
+          reduce_name += words[i] + ' ';
+        } else {
+          reduce_name += words[i].charAt(0) + ' ';
+        }
+      }
+      reduce_name = removeAccent(reduce_name);
+      return reduce_name.toUpperCase().substr(0, limit_size);;
+  }
+
+  </script>
+</head>
+<body>
+  <input type="text" id="txt-name" size="30" >
+  <br /><br />
+  <input type="text" id="txt-name-reduce" size="30" >
+  <script>
+    $(document).ready(function() {
+      $('#txt-name').on("change paste keyup", function() {
+        var reduce_name = reduceName($(this).val(), 20);
+        $('#txt-name-reduce').val('');
+        $('#txt-name-reduce').val(reduce_name);
+      });
+    });
+  </script>
+</body>
+</html>
